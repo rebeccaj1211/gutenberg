@@ -24,7 +24,14 @@ import {
 } from '@wordpress/block-editor';
 import { mediaUpload } from '@wordpress/editor';
 import { Component, Fragment, createRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import {
+	__,
+	sprintf,
+} from '@wordpress/i18n';
+import {
+	compose,
+	withInstanceId,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -124,12 +131,13 @@ class VideoEdit extends Component {
 			autoplay,
 			caption,
 			controls,
+			instanceId,
 			loop,
 			muted,
+			playsInline,
 			poster,
 			preload,
 			src,
-			playsInline,
 		} = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { editing } = this.state;
@@ -165,6 +173,7 @@ class VideoEdit extends Component {
 				/>
 			);
 		}
+		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
@@ -232,11 +241,21 @@ class VideoEdit extends Component {
 											isDefault
 											onClick={ open }
 											ref={ this.posterImageButton }
+											aria-describedby={ videoPosterDescription }
 										>
 											{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
 										</Button>
 									) }
 								/>
+								<p
+									id={ videoPosterDescription }
+									hidden
+								>
+									{ this.props.attributes.poster ?
+										sprintf( __( 'The current poster image url is %s' ), this.props.attributes.poster ) :
+										__( 'There is no poster image currently selected' )
+									}
+								</p>
 								{ !! this.props.attributes.poster &&
 									<Button onClick={ this.onRemovePoster } isLink isDestructive>
 										{ __( 'Remove Poster Image' ) }
@@ -275,4 +294,7 @@ class VideoEdit extends Component {
 	}
 }
 
-export default withNotices( VideoEdit );
+export default compose( [
+	withNotices,
+	withInstanceId,
+] )( VideoEdit );
