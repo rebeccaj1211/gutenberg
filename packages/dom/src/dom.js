@@ -218,6 +218,8 @@ export function getRectangleFromRange( range ) {
 	// See: https://stackoverflow.com/a/6847328/995445
 	if ( ! rect ) {
 		const padNode = document.createTextNode( '\u200b' );
+		// Do not modify to live range.
+		range = range.cloneRange();
 		range.insertNode( padNode );
 		rect = range.getClientRects()[ 0 ];
 		padNode.parentNode.removeChild( padNode );
